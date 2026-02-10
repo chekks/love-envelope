@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love Letter 💌</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #ffe6eb;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Container for envelope */
+.envelope-container {
+  position: relative;
+  width: 80vw;
+  max-width: 300px;
+  aspect-ratio: 3/2;
+  cursor: pointer;
+}
+
+/* SVG full size */
+svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Card after opening */
+.card {
+  display: none;
+  background: white;
+  padding: 20px 25px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  max-width: 400px;
+  margin-top: 20px;
+}
+
+.buttons {
+  position: relative;
+  height: 60px;
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#yes {
+  background-color: #ff4d6d;
+  color: white;
+  margin-right: 20px;
+}
+
+#no {
+  background-color: #ccc;
+  position: absolute;
+}
+
+/* Hearts animation */
+.heart {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: red;
+  transform: rotate(-45deg);
+  animation: float 2s ease-out forwards;
+}
+.heart::before,
+.heart::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: red;
+  border-radius: 50%;
+}
+.heart::before { top: -10px; left: 0; }
+.heart::after { top: 0; left: 10px; }
+
+@keyframes float {
+  0% { transform: translate(0,0) rotate(-45deg); opacity: 1; }
+  100% { transform: translate(var(--x), -200px) rotate(-45deg); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="envelope-container" id="envelopeContainer">
+  <svg viewBox="0 0 300 200">
+    <!-- Transparent rectangle to make the entire SVG tappable -->
+    <rect x="0" y="0" width="300" height="200" fill="transparent"/>
+    
+    <!-- Envelope body -->
+    <rect x="0" y="50" width="300" height="150" rx="10" ry="10" fill="#ff4d6d"/>
+    
+    <!-- Envelope flap group -->
+    <g id="flapGroup">
+      <polygon id="flap" points="0,50 150,0 300,50" fill="#ff1a4d"/>
+    </g>
+    
+    <!-- Envelope text -->
+    <text id="envelopeText" x="150" y="130" text-anchor="middle" fill="white" font-size="24" font-weight="bold" opacity="0">
+      Hi Babe 💌
+    </text>
+  </svg>
+</div>
+
+<div class="card" id="card">
+  <h1>Hi Babe, let’s have a date 💕</h1>
+  <div class="buttons">
+    <button id="yes" onclick="alert('Yay! ❤️ I knew it!')">Yes</button>
+    <button id="no">No</button>
+  </div>
+</div>
+
+<script>
+const flapGroup = document.getElementById("flapGroup");
+const envelopeText = document.getElementById("envelopeText");
+const envelopeContainer = document.getElementById("envelopeContainer");
+const card = document.getElementById("card");
+const noButton = document.getElementById("no");
+
+// Make No button dodge cursor
+noButton.addEventListener("mouseover", () => {
+  const x = Math.random() * 120 - 60;
+  const y = Math.random() * 60 - 30;
+  noButton.style.transform = `translate(${x}px, ${y}px)`;
+});
+
+// Animate flap
+function openFlap() {
+  flapGroup.style.transition = "transform 0.8s cubic-bezier(0.68,-0.55,0.27,1.55)";
+  flapGroup.style.transformOrigin = "150px 50px"; // hinge at top center
+  flapGroup.style.transform = "rotate(-180deg)";
+
+  // Reveal text after flap starts moving
+  setTimeout(() => {
+    envelopeText.setAttribute("opacity", "1");
+  }, 400);
+
+  // Hearts
+  setTimeout(() => createHearts(), 500);
+
+  // Show card after flap opens
+  setTimeout(() => {
+    envelopeContainer.style.display = "none";
+    card.style.display = "block";
+  }, 1000);
+}
+
+// Create hearts flying from flap center
+function createHearts() {
+  const rect = envelopeContainer.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + 20; // top flap approximate
+
+  for(let i=0;i<20;i++){
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.style.left = centerX + (Math.random()*40-20) + 'px';
+    heart.style.top = centerY + (Math.random()*40-20) + 'px';
+    heart.style.setProperty('--x', (Math.random()*200-100)+'px');
+    document.body.appendChild(heart);
+    setTimeout(()=>heart.remove(),2000);
+  }
+}
+
+// Open flap on click/tap (mobile-friendly)
+envelopeContainer.addEventListener("click", openFlap);
+envelopeContainer.addEventListener("touchstart", (e) => {
+  e.preventDefault(); // prevent double trigger
+  openFlap();
+});
+</script>
+
+</body>
+</html>
